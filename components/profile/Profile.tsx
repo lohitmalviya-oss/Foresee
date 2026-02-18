@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Share2, Copy, Trophy, Target, Flame, Zap } from 'lucide-react';
+import { Share2, Trophy, Target, Flame, Zap, Info } from 'lucide-react';
 import { UserProfile } from '../../types/index';
 import { getTierInfo } from '../../utils/tierHelpers';
 import { Card } from '../shared/Card';
@@ -43,10 +43,22 @@ export const Profile: React.FC<ProfileProps> = ({ user, onShare }) => {
 
             <button 
               onClick={onShare}
-              className="w-full py-4 bg-white/5 hover:bg-indigo-600 hover:text-white transition-all rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 border border-white/5 flex items-center justify-center gap-2"
+              className="w-full py-4 bg-white/5 hover:bg-indigo-600 hover:text-white transition-all rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 border border-white/5 flex items-center justify-center gap-2 min-h-[44px]"
             >
               <Share2 size={16} /> Export Track Record
             </button>
+          </Card>
+
+          <Card variant="standard" className="p-8 bg-indigo-50/5 border-indigo-500/10">
+            <div className="flex items-start gap-4 mb-6">
+              <Info className="text-indigo-400 shrink-0" size={16} />
+              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">About My Score</h3>
+            </div>
+            <div className="space-y-4 text-[11px] font-medium text-slate-400 leading-relaxed">
+              <p>Your Credibility Score increases when your forecasts are correct.</p>
+              <p>Low-consensus forecasts earn higher impact.</p>
+              <p>Incorrect forecasts may reduce your score slightly.</p>
+            </div>
           </Card>
 
           <Card variant="standard" className="p-8">
@@ -81,7 +93,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onShare }) => {
                   {s.icon}
                   <div className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{s.label}</div>
                 </div>
-                <div className={`text-3xl font-black text-white`}>
+                <div className={`text-3xl font-black text-white uppercase tracking-tighter`}>
                   <CountUp value={s.val} />{s.suffix}
                 </div>
               </Card>
@@ -98,7 +110,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onShare }) => {
               {user.history.map((h, i) => (
                 <Card key={i} variant="glass" className="p-7 flex items-center justify-between gap-6 border-l-4 border-l-teal-500 bg-slate-900/40">
                   <div className="flex-1">
-                    <h4 className="text-lg font-bold text-white mb-3 leading-tight">{h.question}</h4>
+                    <h4 className="text-lg font-bold text-white mb-3 leading-tight line-clamp-2">{h.question}</h4>
                     <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[9px] font-black text-slate-500 uppercase tracking-widest">
                       <span>Forecast: <span className="text-teal-400">{h.prediction}</span></span>
                       <span>Result: <span className="text-indigo-400">{h.status}</span></span>

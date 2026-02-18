@@ -19,7 +19,7 @@ const generateMockPredictions = (): Prediction[] => {
         "Will India's diplomatic mission in Canada return to full pre-2023 capacity by Q4?",
         "Will the Lok Sabha witness a major structural reform in its digital voting system this session?"
       ],
-      images: ['https://images.unsplash.com/photo-1532375810709-75b1da00537c']
+      images: ['https://images.unsplash.com/photo-1529107386315-e1a2ed48a620']
     },
     Economy: {
       questions: [
@@ -34,7 +34,7 @@ const generateMockPredictions = (): Prediction[] => {
         "Will at least two more Indian states announce a complete transition to a new pension scheme?",
         "Will the UPI transaction volume exceed 15 billion transactions in a single month this year?"
       ],
-      images: ['https://images.unsplash.com/photo-1611974714024-4607a50ad360']
+      images: ['https://images.unsplash.com/photo-1526304640581-d334cdbbf45e']
     },
     Science: {
       questions: [
@@ -49,7 +49,7 @@ const generateMockPredictions = (): Prediction[] => {
         "Will India announce a new regulatory framework for commercial generative AI usage?",
         "Will the semi-conductor manufacturing plant in Gujarat begin pilot production by year-end?"
       ],
-      images: ['https://images.unsplash.com/photo-1451187580459-43490279c0fa']
+      images: ['https://images.unsplash.com/photo-1518770660439-4636190af475']
     },
     Sports: {
       questions: [
@@ -64,7 +64,7 @@ const generateMockPredictions = (): Prediction[] => {
         "Will a second Indian city express official interest in hosting the 2036 Olympics?",
         "Will the Indian badminton contingent win at least three BWF World Tour titles this year?"
       ],
-      images: ['https://images.unsplash.com/photo-1461896704190-3213c9ad99db']
+      images: ['https://images.unsplash.com/photo-1504450758481-7338eba7524a']
     },
     'Stock Market': {
       questions: [
@@ -79,7 +79,7 @@ const generateMockPredictions = (): Prediction[] => {
         "Will a major Indian startup unicorn announce its IPO plans for early 2025 this quarter?",
         "Will the PSU Bank index continue its double-digit growth trend into the next fiscal?"
       ],
-      images: ['https://images.unsplash.com/photo-1611974714024-4607a50ad360']
+      images: ['https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f']
     },
     Culture: {
       questions: [
@@ -105,7 +105,7 @@ const generateMockPredictions = (): Prediction[] => {
         resolved: false,
         createdAt: new Date(Date.now() - (Math.random() * 30) * 24 * 60 * 60 * 1000),
         expiresAt: new Date(Date.now() + (Math.random() * 180 + 30) * 24 * 60 * 60 * 1000),
-        imageUrl: `${content.images[0]}?auto=format&fit=crop&q=80&w=800`
+        imageUrl: `${content.images[0]}?auto=format&fit=crop&q=80&w=1200`
       });
     });
   });
@@ -114,6 +114,9 @@ const generateMockPredictions = (): Prediction[] => {
 };
 
 const MOCK_PREDICTIONS: Prediction[] = generateMockPredictions();
+
+// Store user votes in-memory for the session
+const USER_VOTES: Record<string, { probability: number, updatedAt: Date }> = {};
 
 export const predictionService = {
   getPredictions: async (): Promise<Prediction[]> => {
@@ -126,8 +129,17 @@ export const predictionService = {
   },
 
   submitPrediction: async (userId: string, predictionId: string, probability: number) => {
-    console.log('Mock submit prediction:', { userId, predictionId, probability });
+    const key = `${userId}:${predictionId}`;
+    USER_VOTES[key] = {
+      probability,
+      updatedAt: new Date()
+    };
+    console.log('Mock submit/update forecast:', { userId, predictionId, probability });
     await new Promise(resolve => setTimeout(resolve, 1000));
     return { success: true };
+  },
+
+  getUserPrediction: (userId: string, predictionId: string) => {
+    return USER_VOTES[`${userId}:${predictionId}`] || null;
   }
 };

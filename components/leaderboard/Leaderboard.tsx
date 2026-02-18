@@ -1,8 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-// Added Flame to the imports to resolve the "Cannot find name 'Flame'" error on line 135
-import { Zap, Trophy, TrendingUp, Loader2, Star, Flame } from 'lucide-react';
+import { Zap, Trophy, Loader2, Star, Flame, Info } from 'lucide-react';
 import { Card } from '../shared/Card';
 import { CountUp } from '../shared/CountUp';
 import { LeaderboardEntry } from '../../types/index';
@@ -52,23 +51,43 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onSelectUser }) => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
         <div>
           <h1 className="text-6xl font-black text-white mb-3 tracking-tighter leading-none uppercase">Top Forecasters</h1>
-          <p className="text-slate-500 font-medium tracking-tight">Analytical leaders identified by credibility and performance record.</p>
+          <p className="text-slate-500 font-medium tracking-tight">
+            {rankingType === 'weekly' ? 'Monthly ranking based on Credibility Score gained in the last 30 days.' : 'Ranked by total Credibility Score.'}
+          </p>
         </div>
         <div className="flex bg-slate-900/40 p-1.5 rounded-2xl border border-white/5 backdrop-blur-md">
           <button 
             onClick={() => { setRankingType('weekly'); setLimit(3); }} 
-            className={`px-8 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${rankingType === 'weekly' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`px-8 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${rankingType === 'weekly' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'} min-h-[44px]`}
           >
-            Weekly
+            Monthly
           </button>
           <button 
             onClick={() => { setRankingType('all-time'); setLimit(3); }} 
-            className={`px-8 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${rankingType === 'all-time' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`px-8 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${rankingType === 'all-time' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'} min-h-[44px]`}
           >
             All-Time
           </button>
         </div>
       </div>
+
+      {/* Credibility Score Explanation */}
+      <Card variant="glass" className="p-8 mb-12 bg-indigo-50/5 border-indigo-500/10">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center shrink-0">
+            <Info className="text-indigo-400" size={20} />
+          </div>
+          <div>
+            <h4 className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-3">About Credibility Scores</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-[11px] font-medium text-slate-400 leading-relaxed">
+              <p>• Score increases when your forecasts are correct.</p>
+              <p>• Low-consensus forecasts earn higher impact.</p>
+              <p>• Incorrect forecasts may reduce your score slightly.</p>
+              <p>• Early forecasts may receive higher weight.</p>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <div className="space-y-4">
         <div className="hidden md:grid grid-cols-12 px-8 text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] pb-2">
@@ -76,7 +95,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onSelectUser }) => {
           <div className="col-span-5">Forecaster Profile</div>
           <div className="col-span-2 text-center">Credibility Tier</div>
           <div className="col-span-2 text-center">Score</div>
-          <div className="col-span-2 text-right">Engagement</div>
+          <div className="col-span-2 text-right">Activity</div>
         </div>
 
         <AnimatePresence mode="popLayout">
@@ -147,7 +166,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onSelectUser }) => {
           <button 
             onClick={handleLoadMore}
             disabled={isLoadingMore}
-            className="px-10 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-3 mx-auto"
+            className="px-10 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-3 mx-auto min-h-[44px]"
           >
             {isLoadingMore ? <Loader2 size={16} className="animate-spin" /> : null}
             {isLoadingMore ? 'Synchronizing Node Data...' : 'Load Additional Forecasters'}

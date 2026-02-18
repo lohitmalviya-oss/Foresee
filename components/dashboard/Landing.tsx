@@ -1,10 +1,25 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, ArrowRight, Target, BrainCircuit, Trophy, Zap, Activity, BarChart3, Star } from 'lucide-react';
+import { 
+  Sparkles, 
+  Target, 
+  BrainCircuit, 
+  Trophy, 
+  Zap, 
+  Activity, 
+  BarChart3, 
+  Star, 
+  CheckCircle2, 
+  Info, 
+  TrendingUp, 
+  UserCheck,
+  ArrowRight
+} from 'lucide-react';
 import { Prediction } from '../../types/index';
 import { PredictionCard } from '../prediction/PredictionCard';
 import { Card } from '../shared/Card';
+import { useAuth } from '../../context/AuthContext';
 
 interface LandingProps {
   onStart: () => void;
@@ -14,6 +29,7 @@ interface LandingProps {
 }
 
 export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, onSelectEvent, setActiveTab }) => {
+  const { userForecasts } = useAuth();
   const heroPrediction = featuredPredictions[0];
   
   const mockTopForecasters = [
@@ -36,32 +52,73 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
     { name: 'Varun_Trade', gain: '+1,820', accuracy: '92.8%', avatar: 'V' }
   ];
 
+  const steps = [
+    { icon: <Target className="text-indigo-600" />, title: "Submit Forecast", desc: "Submit your forecast on real-world events." },
+    { icon: <CheckCircle2 className="text-emerald-600" />, title: "Verified Outcome", desc: "Forecast resolves based on verified outcome." },
+    { icon: <TrendingUp className="text-violet-600" />, title: "Score Update", desc: "Your Credibility Score updates based on accuracy and difficulty." },
+    { icon: <UserCheck className="text-amber-600" />, title: "Profile Building", desc: "Build your professional forecasting profile." }
+  ];
+
   return (
     <div className="flex flex-col items-center w-full bg-slate-50">
       {/* 1. HERO SECTION */}
-      <section className="w-full pt-40 pb-24 px-6 max-w-7xl mx-auto flex flex-col items-center">
+      <section className="w-full pt-40 pb-16 px-6 max-w-7xl mx-auto flex flex-col items-center">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 text-[10px] font-black uppercase tracking-[0.25em] mb-12 shadow-sm"
+          className="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 text-[10px] font-black uppercase tracking-[0.25em] mb-8 shadow-sm"
         >
           <Target size={14} className="animate-pulse" /> India's Premier Forecasting Platform
         </motion.div>
         
-        <div className="w-full">
+        <div className="w-full mb-8">
           {heroPrediction && (
             <PredictionCard 
               prediction={heroPrediction} 
               index={0} 
               variant="hero" 
               onClick={() => onSelectEvent(heroPrediction)}
+              hasParticipated={userForecasts.includes(heroPrediction.id)}
             />
           )}
         </div>
+
+        <div className="flex items-center gap-3 text-slate-400 text-[10px] font-bold uppercase tracking-[0.1em] text-center max-w-2xl px-6">
+          <Info size={14} className="shrink-0" />
+          <span>Foresee does not involve money, betting, or trading. It is a professional forecasting and analytical performance platform. Content does not constitute financial or investment advice.</span>
+        </div>
       </section>
 
-      {/* 2. ANALYST & ACTIVITY SECTION */}
-      <section className="w-full bg-white border-y border-slate-100 py-32 px-6">
+      {/* 2. HOW FORESEE WORKS */}
+      <section className="w-full py-20 bg-white border-y border-slate-100 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-xs font-black text-indigo-500 uppercase tracking-[0.4em] mb-4">The Process</h2>
+            <h3 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">How Foresee Works</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {steps.map((step, i) => (
+              <div key={i} className="relative group">
+                <Card variant="stat" className="h-full p-8 bg-slate-50 border-slate-100 group-hover:border-indigo-200 transition-colors">
+                  <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-6">
+                    {step.icon}
+                  </div>
+                  <h4 className="text-lg font-black text-slate-900 uppercase tracking-tight mb-2">Step {i + 1}</h4>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">{step.desc}</p>
+                </Card>
+                {i < steps.length - 1 && (
+                  <div className="hidden lg:block absolute top-1/2 -right-4 translate-x-0 -translate-y-1/2 z-10">
+                    <ArrowRight size={24} className="text-slate-200" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. ANALYST & ACTIVITY SECTION */}
+      <section className="w-full bg-slate-50 py-32 px-6">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16">
           
           {/* Top Forecasters This Month */}
@@ -71,35 +128,35 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
                 <Star className="text-amber-500 fill-amber-500" size={20} />
                 <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">Monthly Recognition</span>
               </div>
-              <h3 className="text-4xl font-black text-slate-900 uppercase tracking-tighter mb-4">Top Forecasters This Month</h3>
-              <p className="text-slate-500 font-medium">Leading analysts by credibility score gain in the last 30 days.</p>
+              <h3 className="text-4xl font-black text-slate-900 uppercase tracking-tighter mb-2">Top Forecasters This Month</h3>
+              <p className="text-slate-500 font-medium text-sm">Monthly ranking based on Credibility Score gained in the last 30 days.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
               {topMonthlyGainers.map((user, i) => (
-                <Card key={i} className="p-6 bg-slate-50/50 border-slate-100 flex flex-col items-center text-center">
-                  <div className="w-12 h-12 rounded-full bg-white border border-slate-100 flex items-center justify-center font-black text-indigo-600 mb-4 shadow-sm">
+                <Card key={i} className="p-6 bg-white border-slate-100 flex flex-col items-center text-center">
+                  <div className="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center font-black text-indigo-600 mb-4 shadow-sm">
                     {user.avatar}
                   </div>
                   <div className="text-xs font-black text-slate-900 mb-1">{user.name}</div>
                   <div className="text-emerald-500 font-black text-lg mb-2">{user.gain}</div>
-                  <div className="px-2 py-0.5 rounded-md bg-white text-[8px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest">
+                  <div className="px-2 py-0.5 rounded-md bg-slate-50 text-[8px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest">
                     Top Performer
                   </div>
                 </Card>
               ))}
             </div>
 
-            <div className="space-y-4 pt-12 border-t border-slate-100">
+            <div className="space-y-4 pt-12 border-t border-slate-200">
                <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Top Analysts Ranking</h4>
               {mockTopForecasters.map((user, i) => (
                 <Card 
                   key={i} 
                   variant="leaderboard" 
-                  className="flex items-center justify-between p-6 bg-slate-50/50 border-slate-100"
+                  className="flex items-center justify-between p-6 bg-white border-slate-100"
                 >
                   <div className="flex items-center gap-6">
-                    <span className={`text-2xl font-black ${i === 0 ? 'text-amber-500' : 'text-slate-300'}`}>0{user.rank}</span>
+                    <span className={`text-2xl font-black ${i === 0 ? 'text-amber-500' : 'text-slate-300'}`}>{user.rank}</span>
                     <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-black border border-indigo-100">
                       {user.avatar}
                     </div>
@@ -117,6 +174,7 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
                   </div>
                 </Card>
               ))}
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center mt-4">Ranked by total Credibility Score.</p>
             </div>
           </div>
 
@@ -124,7 +182,7 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
           <div className="lg:col-span-5 space-y-12">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-2">Recent Forecast Activity</h3>
+                <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-2">Recent activity</h3>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live Analytical Stream</p>
               </div>
               <div className="flex items-center gap-2 text-emerald-500 animate-pulse">
@@ -132,7 +190,7 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
               </div>
             </div>
 
-            <Card variant="glass" className="bg-slate-50/30 p-2 overflow-hidden border-slate-100 shadow-sm">
+            <Card variant="glass" className="bg-white p-2 overflow-hidden border-slate-100 shadow-sm">
               <div className="divide-y divide-slate-100">
                 {recentActivity.map((act, i) => (
                   <motion.div 
@@ -140,7 +198,7 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
                     key={i} 
-                    className="p-5 flex items-start gap-4 group hover:bg-white transition-colors"
+                    className="p-5 flex items-start gap-4 group hover:bg-slate-50 transition-colors"
                   >
                     <div className="w-2 h-2 rounded-full bg-indigo-500 mt-1.5" />
                     <div className="flex-1">
@@ -157,7 +215,7 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
                   </motion.div>
                 ))}
               </div>
-              <button onClick={() => setActiveTab?.('dashboard')} className="w-full py-4 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-t border-slate-100 hover:text-indigo-600 hover:bg-white transition-all">
+              <button onClick={() => setActiveTab?.('dashboard')} className="w-full py-4 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-t border-slate-100 hover:text-indigo-600 hover:bg-slate-50 transition-all min-h-[44px]">
                 Browse More Insights
               </button>
             </Card>
@@ -174,7 +232,7 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
                 <div className="flex items-center gap-4">
                   <div className="text-center">
                     <div className="text-xl font-black">150K+</div>
-                    <div className="text-[8px] font-black uppercase tracking-widest opacity-70">Submissions</div>
+                    <div className="text-[8px] font-black uppercase tracking-widest opacity-70">Forecasts Submitted</div>
                   </div>
                   <div className="w-px h-8 bg-white/20" />
                   <div className="text-center">
@@ -189,9 +247,9 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
         </div>
       </section>
 
-      {/* 3. CORE ANALYTICS & CTA SECTION */}
-      <section className="w-full bg-slate-50 border-b border-slate-100 py-32 px-6 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-[40%] h-full bg-gradient-to-l from-indigo-100/20 to-transparent pointer-events-none" />
+      {/* 4. CORE ANALYTICS & CTA SECTION */}
+      <section className="w-full bg-white border-b border-slate-100 py-32 px-6 overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-[40%] h-full bg-gradient-to-l from-indigo-100/10 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-24 relative z-10">
           <div className="flex-1">
             <h2 className="text-6xl md:text-8xl font-black text-slate-900 mb-10 tracking-tighter leading-none font-manrope">
@@ -204,7 +262,7 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
                 { icon: <Trophy className="text-amber-500" />, title: "Professional Status", desc: "Rise from Emerging Forecaster to Elite status as your credibility grows." }
               ].map((item, i) => (
                 <div key={i} className="flex gap-6">
-                  <div className="shrink-0 w-14 h-14 rounded-2xl bg-white flex items-center justify-center border border-slate-100 shadow-sm">{item.icon}</div>
+                  <div className="shrink-0 w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">{item.icon}</div>
                   <div>
                     <h4 className="text-slate-900 font-black uppercase text-base tracking-widest mb-1">{item.title}</h4>
                     <p className="text-slate-500 text-sm leading-relaxed max-w-sm">{item.desc}</p>
@@ -215,7 +273,7 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
             <motion.button 
               whileHover={{ scale: 1.05 }} 
               onClick={onStart}
-              className="px-14 py-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-3xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-indigo-600/30 transition-all"
+              className="px-14 py-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-3xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-indigo-600/30 transition-all min-h-[44px]"
             >
               Start Forecasting
             </motion.button>
@@ -230,6 +288,7 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
                     index={idx} 
                     variant="standard" 
                     onClick={() => onSelectEvent(p)} 
+                    hasParticipated={userForecasts.includes(p.id)}
                   />
                 ))}
              </div>
@@ -240,13 +299,16 @@ export const Landing: React.FC<LandingProps> = ({ onStart, featuredPredictions, 
       <footer className="w-full py-24 px-6 bg-white border-t border-slate-100 text-center">
         <div className="flex flex-col items-center gap-10">
           <div className="text-4xl font-black text-slate-900 font-manrope uppercase tracking-tighter">FORESEE</div>
-          <div className="flex flex-wrap justify-center gap-x-12 gap-y-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+          <div className="flex flex-wrap justify-center gap-x-12 gap-y-6 text-[10px] font-black text-slate-400 uppercase tracking-widest max-w-4xl">
             <span onClick={() => setActiveTab?.('methodology')} className="hover:text-indigo-600 cursor-pointer transition-colors">Forecasting Methodology</span>
             <span onClick={() => setActiveTab?.('leaderboard')} className="hover:text-indigo-600 cursor-pointer transition-colors">Top Forecasters</span>
             <span onClick={() => setActiveTab?.('privacy')} className="hover:text-indigo-600 cursor-pointer transition-colors">Privacy & Data</span>
             <span onClick={() => setActiveTab?.('support')} className="hover:text-indigo-600 cursor-pointer transition-colors">Support</span>
           </div>
-          <p className="text-slate-300 text-[10px] font-bold uppercase tracking-[0.5em] mt-10">Professional Insight Network • Data-Driven Foresight</p>
+          <div className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.1em] max-w-2xl text-center leading-relaxed">
+            Foresee does not involve money, betting, or trading. It is a professional forecasting and analytical performance platform. Content does not constitute financial or investment advice.
+          </div>
+          <p className="text-slate-300 text-[10px] font-bold uppercase tracking-[0.5em] mt-6">Professional Insight Network • Data-Driven Foresight</p>
         </div>
       </footer>
     </div>

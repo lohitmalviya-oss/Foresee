@@ -13,32 +13,35 @@ import { Profile } from './components/profile/Profile';
 import { ForecasterProfile } from './components/profile/ForecasterProfile';
 import { ThemeLab } from './pages/ThemeLab';
 import { Methodology, Privacy, Support } from './components/static/StaticPages';
-import { Prediction, LeaderboardEntry } from './types/index';
+import { Prediction, LeaderboardEntry, UserProfile } from './types/index';
 import { usePredictions } from './hooks/usePredictions';
 import { useUserProfile } from './hooks/useUserProfile';
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
 import { AppProvider } from './context/AppContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState('landing');
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Prediction | null>(null);
   const [selectedForecaster, setSelectedForecaster] = useState<LeaderboardEntry | null>(null);
 
   const { predictions, filter, setFilter, loading: predictionsLoading, error: predictionsError } = usePredictions();
-  const { user, isAuthenticated, login, loading: userLoading, error: userError } = useUserProfile();
+  const { user: authUser, isAuthenticated, isLoading: authLoading } = useAuth();
 
-  const isLoading = predictionsLoading || userLoading;
-  const globalError = predictionsError || userError;
+  const isLoading = predictionsLoading || authLoading;
+  const globalError = predictionsError;
 
   const featuredPredictions = useMemo(() => predictions.slice(0, 6), [predictions]);
 
   useEffect(() => {
     (window as any).activateThemeLab = () => setActiveTab('themelab');
-    const openAuth = () => setShowAuthModal(true);
-    window.addEventListener('open-auth-modal', openAuth);
-    return () => window.removeEventListener('open-auth-modal', openAuth);
+    
+    // Listen for custom global auth events
+    const handleGlobalAuthRequest = () => setIsAuthModalOpen(true);
+    window.addEventListener('open-auth-modal', handleGlobalAuthRequest);
+    return () => window.removeEventListener('open-auth-modal', handleGlobalAuthRequest);
   }, []);
 
   const handleStart = useCallback(() => {
@@ -46,19 +49,32 @@ const AppContent: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const handleAuthSuccess = useCallback(() => {
-    login();
-    setShowAuthModal(false);
-    if (activeTab === 'landing') {
-      setActiveTab('dashboard');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, [login, activeTab]);
-
   const navigateBack = () => {
     setActiveTab('dashboard');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Sync authUser to legacy user structure for UI compatibility
+  const currentUser: UserProfile | null = useMemo(() => {
+    if (!authUser) return null;
+    return {
+      id: authUser.id,
+      username: authUser.name,
+      reputation: authUser.credibilityScore || 0,
+      accuracy: 85,
+      accuracyDelta: 0,
+      percentile: 50,
+      contrarianWins: 0,
+      streak: 1,
+      rank: 1000,
+      level: 'Observer',
+      tierScore: 0,
+      predictionsCount: 0,
+      referralCode: 'MOCK',
+      expertise: { Economy: 0, Politics: 0, Science: 0, Sports: 0, Culture: 0 },
+      history: []
+    };
+  }, [authUser]);
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-main)] font-inter selection:bg-[var(--primary)] selection:text-white pb-20 transition-colors duration-300">
@@ -69,22 +85,21 @@ const AppContent: React.FC = () => {
           activeTab={activeTab} 
           setActiveTab={setActiveTab} 
           isAuthenticated={isAuthenticated} 
-          onAuthClick={() => setShowAuthModal(true)} 
-          user={user || {} as any}
+          onAuthClick={() => setIsAuthModalOpen(true)} 
+          user={currentUser || {} as any}
         />
       )}
-      
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
-        onAuthSuccess={handleAuthSuccess} 
-      />
 
-      {user && (
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+      />
+      
+      {currentUser && (
         <ShareModal 
           isOpen={showShareModal} 
           onClose={() => setShowShareModal(false)} 
-          user={user} 
+          user={currentUser} 
         />
       )}
 
@@ -94,8 +109,8 @@ const AppContent: React.FC = () => {
             event={selectedEvent} 
             onClose={() => setSelectedEvent(null)} 
             isAuthenticated={isAuthenticated} 
-            onAuthClick={() => setShowAuthModal(true)} 
-            user={user || {} as any}
+            onAuthClick={() => setIsAuthModalOpen(true)} 
+            user={currentUser || {} as any}
           />
         )}
       </AnimatePresence>
@@ -140,7 +155,7 @@ const AppContent: React.FC = () => {
         
         {activeTab === 'dashboard' && (
           <Dashboard 
-            user={user || undefined} 
+            user={currentUser || undefined} 
             predictions={predictions} 
             filter={filter} 
             setFilter={setFilter} 
@@ -149,7 +164,7 @@ const AppContent: React.FC = () => {
         )}
 
         {activeTab === 'leaderboard' && <Leaderboard onSelectUser={(u) => setSelectedForecaster(u)} />}
-        {activeTab === 'profile' && user && <Profile user={user} onShare={() => setShowShareModal(true)} />}
+        {activeTab === 'profile' && currentUser && <Profile user={currentUser} onShare={() => setShowShareModal(true)} />}
         
         {activeTab === 'methodology' && <Methodology onBack={navigateBack} />}
         {activeTab === 'privacy' && <Privacy onBack={navigateBack} />}
@@ -165,8 +180,10 @@ const AppContent: React.FC = () => {
 
 export const App: React.FC = () => (
   <ErrorBoundary>
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <AuthProvider>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </AuthProvider>
   </ErrorBoundary>
 );

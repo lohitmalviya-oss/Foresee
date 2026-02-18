@@ -1,23 +1,28 @@
 
-export const calculatePotentialReward = (userProb: number, crowdProb: number, streak: number, isEarly: boolean): { total: number, breakdown: any } => {
+export const calculatePotentialReward = (userProb: number, crowdProb: number, streak: number): { total: number, loss: number, breakdown: any } => {
   const baseRep = 100;
+  
   // Confidence scaling (normalized around 50)
+  // Higher confidence = higher stakes (more gain, more potential loss)
   const confidenceMultiplier = 1 + (Math.abs(userProb - 50) / 50); 
-  // Contrarian Bonus: Reward for being different from the crowd
-  const contrarianBonus = 1 + (Math.abs(userProb - crowdProb) / 100);
-  // Early Bird Bonus
-  const earlyMultiplier = isEarly ? 1.2 : 1.0;
-  // Streak Multiplier: +5% gain for every 5 days of streak
+  
+  // Contrarian factor: Reward for being correct when the crowd is wrong
+  const contrarianFactor = 1 + (Math.abs(userProb - crowdProb) / 100);
+  
+  // Streak Multiplier: Small consistency bonus remains for correct outcomes
   const streakMultiplier = 1 + (Math.floor(streak / 5) * 0.05);
 
-  const total = Math.floor(baseRep * confidenceMultiplier * contrarianBonus * earlyMultiplier * streakMultiplier);
+  const potentialGain = Math.floor(baseRep * confidenceMultiplier * contrarianFactor * streakMultiplier);
+  
+  // Potential loss is a percentage of the potential gain, or a flat penalty scaled by confidence
+  const potentialLoss = Math.floor(baseRep * 0.5 * confidenceMultiplier);
   
   return {
-    total,
+    total: potentialGain,
+    loss: potentialLoss,
     breakdown: {
       confidence: confidenceMultiplier.toFixed(2),
-      contrarian: contrarianBonus.toFixed(2),
-      early: earlyMultiplier.toFixed(2),
+      contrarian: contrarianFactor.toFixed(2),
       streak: streakMultiplier.toFixed(2)
     }
   };

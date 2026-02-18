@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Target, LayoutDashboard, Trophy, User, Zap, LogIn } from 'lucide-react';
+import { Target, LayoutDashboard, Trophy, User, Zap, LogIn, LogOut } from 'lucide-react';
 import { CountUp } from '../shared/CountUp';
 import { UserProfile } from '../../types/index';
+import { useAuth } from '../../context/AuthContext';
 
 interface NavbarProps {
   activeTab: string;
@@ -14,6 +15,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, isAuthenticated, onAuthClick, user }) => {
+  const { logout } = useAuth();
   const navItems = [
     { id: 'dashboard', label: 'Participate', icon: <LayoutDashboard size={16} />, public: true },
     { id: 'leaderboard', label: 'Top Forecasters', icon: <Trophy size={16} />, public: true },
@@ -69,6 +71,13 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, isAuthe
             >
               <User className="text-[var(--primary)] group-hover:text-white w-5 h-5" />
             </motion.button>
+            <button 
+              onClick={() => { logout(); setActiveTab('landing'); }}
+              className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
+              title="Sign Out"
+            >
+              <LogOut size={20} />
+            </button>
           </div>
         ) : (
           <motion.button 
