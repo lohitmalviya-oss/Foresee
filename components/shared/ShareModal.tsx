@@ -36,25 +36,23 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, user })
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }} 
           onClick={handleOverlayClick}
-          className="fixed inset-0 z-[200] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-6"
+          className="fixed inset-0 z-[200] bg-slate-950/90 backdrop-blur-md flex items-start justify-center p-6 overflow-y-auto"
         >
           <motion.div 
             initial={{ scale: 0.9, y: 20 }} 
             animate={{ scale: 1, y: 0 }} 
             exit={{ scale: 0.9, y: 20 }} 
-            className="max-w-md w-full relative" 
+            className="max-w-md w-full relative my-auto" 
             onClick={e => e.stopPropagation()}
           >
-            {/* High Visibility Close Button */}
-            <button 
-              onClick={onClose} 
-              aria-label="Close"
-              className="absolute -top-4 -right-4 w-11 h-11 bg-white text-slate-900 rounded-full flex items-center justify-center shadow-2xl z-20 hover:scale-110 active:scale-95 transition-transform"
-            >
-              <X size={24} strokeWidth={3} />
-            </button>
-
-            <GlassCard className="p-8 relative border-white/10 shadow-3xl bg-gradient-to-br from-slate-900 to-indigo-950/40 overflow-visible">
+            <GlassCard className="p-8 relative border-white/10 shadow-3xl bg-gradient-to-br from-slate-900 to-indigo-950/40 overflow-hidden">
+              <button 
+                onClick={onClose} 
+                aria-label="Close"
+                className="absolute top-4 right-4 w-10 h-10 bg-white/10 text-slate-400 hover:text-white hover:bg-white/20 rounded-full flex items-center justify-center z-20 transition-all"
+              >
+                <X size={20} strokeWidth={2.5} />
+              </button>
               <div className="text-center mb-8">
                 <button 
                   onClick={onClose}
