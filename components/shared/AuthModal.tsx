@@ -107,24 +107,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }} 
           onClick={handleOverlayClick}
-          className="fixed inset-0 z-[200] bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-6"
+          className="fixed inset-0 z-[200] bg-slate-950/90 backdrop-blur-xl flex items-start justify-center p-6 overflow-y-auto"
         >
           <motion.div 
             initial={{ y: 20, opacity: 0, scale: 0.95 }} 
             animate={{ y: 0, opacity: 1, scale: 1 }} 
             exit={{ y: 20, opacity: 0, scale: 0.95 }} 
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="max-w-md w-full relative"
+            className="max-w-md w-full relative my-auto"
           >
-            <button 
-              onClick={onClose} 
-              aria-label="Close modal"
-              className="absolute -top-4 -right-4 w-11 h-11 bg-white text-slate-900 rounded-full flex items-center justify-center shadow-2xl z-20 hover:scale-110 active:scale-95 transition-transform"
-            >
-              <X size={24} strokeWidth={3} />
-            </button>
-
-            <GlassCard className="p-8 md:p-10 bg-white border-slate-200 shadow-2xl overflow-visible">
+            <GlassCard className="p-8 md:p-10 bg-white border-slate-200 shadow-2xl relative overflow-hidden">
+              <button 
+                onClick={onClose} 
+                aria-label="Close modal"
+                className="absolute top-4 right-4 w-10 h-10 bg-slate-50 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full flex items-center justify-center z-20 transition-all"
+              >
+                <X size={20} strokeWidth={2.5} />
+              </button>
               <div className="text-center mb-8">
                 <motion.div 
                   whileHover={{ rotate: 10 }}
